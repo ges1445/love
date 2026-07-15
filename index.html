@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>致我喜欢的人</title>
+<style>
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body{
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffd6e0, #f8bbd0, #e1bee7);
+  font-family: "Microsoft YaHei", sans-serif;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card{
+  background: rgba(255,255,255,0.92);
+  width: 90%;
+  max-width: 520px;
+  padding: 50px 35px;
+  border-radius: 26px;
+  box-shadow: 0 12px 40px rgba(216, 80, 128, 0.22);
+  text-align: center;
+  z-index: 10;
+}
+.heart-icon{
+  font-size: 66px;
+  color: #e63963;
+  animation: beat 1s infinite ease-in-out;
+  margin-bottom: 24px;
+}
+@keyframes beat{
+  0%,100%{transform: scale(1);}
+  50%{transform: scale(1.15);}
+}
+.title{
+  font-size: 28px;
+  color: #b92c50;
+  margin-bottom: 22px;
+}
+.desc{
+  color: #444;
+  font-size: 17px;
+  line-height: 1.8;
+  margin-bottom: 36px;
+}
+.button-wrap{
+  display: flex;
+  gap: 26px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+button{
+  border: none;
+  font-size: 18px;
+  padding: 13px 34px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+#agreeBtn{
+  background: #e63963;
+  color: #fff;
+}
+#agreeBtn:hover{
+  transform: scale(1.06);
+  background: #d02e54;
+}
+#refuseBtn{
+  background: #e8e8e8;
+  color: #333;
+}
+#refuseBtn:hover{
+  background: #dddddd;
+}
+.success-box{
+  display: none;
+  margin-top: 32px;
+  font-size: 22px;
+  color: #b92c50;
+  font-weight: 500;
+}
+/* 飘落爱心样式 */
+.fly-heart{
+  position: absolute;
+  color: #ff577f;
+  pointer-events: none;
+  animation: fall 6s linear forwards;
+}
+@keyframes fall{
+  0%{
+    transform: translateY(-30px) rotate(0deg);
+    opacity: 1;
+  }
+  100%{
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+/* 成功爆炸爱心 */
+.burst-heart{
+  position: absolute;
+  font-size: 30px;
+  color: #ff4466;
+  animation: burst 1.2s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes burst{
+  0%{
+    transform: translate(0,0) scale(1);
+    opacity:1;
+  }
+  100%{
+    transform: translate(var(--tx),var(--ty)) scale(0);
+    opacity:0;
+  }
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="heart-icon">❤</div>
+  <h2 class="title">我喜欢你</h2>
+  <p class="desc">
+    犹豫了很久，终于鼓起勇气向你告白。<br>
+    你愿意做我的恋人，和我一起往前走吗？
+  </p>
+  <div class="button-wrap">
+    <button id="agreeBtn">我愿意</button>
+    <button id="refuseBtn">再考虑一下</button>
+  </div>
+  <div class="success-box" id="successText">
+    太好了！往后四季，我都会好好陪着你 ❤
+  </div>
+</div>
+
+<script>
+const agreeBtn = document.getElementById('agreeBtn');
+const refuseBtn = document.getElementById('refuseBtn');
+const successText = document.getElementById('successText');
+
+// 多次拒绝切换不同文案
+const tips = [
+  "真的不考虑一下吗，我是认真的！",
+  "再好好想一想好不好，我真的很喜欢你",
+  "别这么快拒绝嘛，给我一个机会可以吗",
+  "我不想错过你，再慎重考虑下",
+  "拜托啦，答应我好不好？"
+];
+let refuseCount = 0;
+
+// 点击同意：展示结果 + 爱心爆炸
+agreeBtn.onclick = function(){
+  successText.style.display = "block";
+  agreeBtn.style.display = "none";
+  refuseBtn.style.display = "none";
+  createBurstHeart();
+}
+
+// 拒绝逻辑：无限弹窗循环
+refuseBtn.onclick = function(){
+  loopAsk();
+}
+
+function loopAsk(){
+  let keepAsk = true;
+  while(keepAsk){
+    const idx = Math.min(refuseCount, tips.length - 1);
+    const userSelect = confirm(tips[idx]);
+    refuseCount++;
+    if(userSelect){
+      keepAsk = false;
+      // 在弹窗里选择愿意，直接触发成功效果
+      successText.style.display = "block";
+      agreeBtn.style.display = "none";
+      refuseBtn.style.display = "none";
+      createBurstHeart();
+    }
+  }
+}
+
+// 持续生成背景飘落爱心
+function createFallHeart(){
+  const heart = document.createElement('div');
+  heart.className = "fly-heart";
+  heart.innerText = "❤";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = Math.random() * 22 + 12 + "px";
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+}
+setInterval(createFallHeart, 400);
+
+// 点击同意时爱心爆发特效
+function createBurstHeart(){
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  for(let i = 0; i < 40; i++){
+    const h = document.createElement("div");
+    h.className = "burst-heart";
+    h.innerText = "❤";
+    const angle = (Math.PI * 2 / 40) * i;
+    const dist = 120 + Math.random() * 180;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist;
+    h.style.setProperty("--tx", tx + "px");
+    h.style.setProperty("--ty", ty + "px");
+    h.style.left = centerX + "px";
+    h.style.top = centerY + "px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),1200);
+  }
+}
+</script>
+</body>
+</html>
